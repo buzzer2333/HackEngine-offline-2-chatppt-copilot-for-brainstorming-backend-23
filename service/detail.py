@@ -1,55 +1,37 @@
-from module.message import Message 
 from typing import Optional, Tuple, List, Union, Literal
 import openai
 from dataclasses import dataclass, asdict
+import streamlit as st
+from textwrap import dedent
+
+@dataclass
+class Message:
+    """A class that represents a message in a ChatGPT conversation.
+    """
+    content: str
+    role: Literal["user", "system", "assistant"]
+
+    # is a built-in method for dataclasses
+    # called after the __init__ method
+    def __post_init__(self):
+        self.content = dedent(self.content).strip()
+
 
 DETAIL_CONVERSATION = [
     Message("""
-        You are a useful mind map/undirected graph-generating AI that can generate mind maps
-        based on any input or instructions.
+        你是一个行业专家你可以回答行业专业问题
     """, role="system"),
     Message("""
-        You have the ability to perform the following actions given a request
-        to construct or modify a mind map/graph:
-
-        1. add(node1, node2) - add an edge between node1 and node2
-        2. delete(node1, node2) - delete the edge between node1 and node2
-        3. delete(node1) - deletes every edge connected to node1
-
-        Note that the graph is undirected and thus the order of the nodes does not matter
-        and duplicates will be ignored. Another important note: the graph should be sparse,
-        with many nodes and few edges from each node. Too many edges will make it difficult 
-        to understand and hard to read. The answer should only include the actions to perform, 
-        nothing else. If the instructions are vague or even if only a single word is provided, 
-        still generate a graph of multiple nodes and edges that that could makes sense in the 
-        situation. Remember to think step by step and debate pros and cons before settling on 
-        an answer to accomplish the request as well as possible.
-
-        Here is my first request: Add a mind map about machine learning.
+        如果我要做空气净化功能，我的目标用户群体可以是谁
     """, role="user"),
     Message("""
-        add("Machine learning","AI")
-        add("Machine learning", "Reinforcement learning")
-        add("Machine learning", "Supervised learning")
-        add("Machine learning", "Unsupervised learning")
-        add("Supervised learning", "Regression")
-        add("Supervised learning", "Classification")
-        add("Unsupervised learning", "Clustering")
-        add("Unsupervised learning", "Anomaly Detection")
-        add("Unsupervised learning", "Dimensionality Reduction")
-        add("Unsupervised learning", "Association Rule Learning")
-        add("Clustering", "K-means")
-        add("Classification", "Logistic Regression")
-        add("Reinforcement learning", "Proximal Policy Optimization")
-        add("Reinforcement learning", "Q-learning")
-    """, role="assistant"),
-    Message("""
-        Remove the parts about reinforcement learning and K-means.
-    """, role="user"),
-    Message("""
-        delete("Reinforcement learning")
-        delete("Clustering", "K-means")
-    """, role="assistant")
+    空气净化功能可以吸引多种用户群体，例如：
+对空气质量有高要求的人群：例如患有哮喘或过敏症的人，他们需要在车内呼吸到干净的空气以避免过敏反应。
+车辆长时间停放在封闭环境内的用户：例如停在车库或地下停车场的车辆，车内空气可能会污染，使用空气净化功能可以有效净化空气，使车内环境更加健康。
+家庭有婴幼儿的用户：对于这些用户来说，车内空气质量对婴幼儿健康至关重要，使用空气净化功能可以保证车内空气的质量。
+职业司机：长时间驾驶车辆的司机需要呼吸干净的空气，以避免疲劳和健康问题。
+对环保有意识的人群：这些用户关心环境保护和减少对环境的污染，使用空气净化功能可以减少车辆对环境的影响。
+总之，使用空气净化功能可以让车内空气更加清新健康，吸引多种用户群体的关注。""", role="assistant")
 ]
 
 def ask_chatgpt_detail(conversation: List[Message]) -> Tuple[str, List[Message]]:
@@ -67,5 +49,44 @@ def ask_chatgpt_detail(conversation: List[Message]) -> Tuple[str, List[Message]]
     
     return msg.content, conversation + [msg]
 
-if __name__ == "__main__":
-    ask_chatgpt_detail()
+class EntityInfos:
+    """A class that represents entity infos
+    """
+
+    def __init__(self, **nodes) -> None:
+        self.nodesInfo = [] if nodes is None else nodes
+        self.save()
+
+    @classmethod
+    def load(cls):
+        """Load EntityInfo from session state if it exists
+        
+        Returns: entityInfos
+        """
+        if "entityInfos" in st.session_state:
+            return st.session_state["entityInfos"]
+        return cls()
+
+    def save(self) -> None:
+        # save to session state
+        st.session_state["entityInfos"] = self
+
+    def ask_for_more_detail(self, query: str) -> None:
+        """Ask GPT-3 to construct a graph from scrach.
+
+        Args:
+            query (str): The query to ask GPT-3 about.
+
+        Returns:
+            str: The output from GPT-3.
+        """
+
+        conversation = DETAIL_CONVERSATION + [
+            Message(f"""
+                Great, 我会问你些具体问题:    
+                {query}
+            """, role="user")
+        ]
+
+        output, self.conversation = ask_chatgpt_detail(conversation)
+        # replace=True to restart

@@ -16,10 +16,11 @@ from service.mapping import MindMap
 from module.message import Message
 from app import app
 
+
 # set title of page (will be seen in tab) and the width
 st.set_page_config(page_title="AI Mind Maps", layout="wide")
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 def main():
     # will initialize the graph from session state
