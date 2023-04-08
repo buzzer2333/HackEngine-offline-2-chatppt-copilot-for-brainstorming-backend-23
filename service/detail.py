@@ -11,13 +11,10 @@ def ask_chatgpt_detail(conversation: List[Message]) -> Tuple[str, List[Message]]
         # asdict comes from `from dataclasses import asdict`
         messages=[asdict(c) for c in conversation]
     )
-
-    print("response:", response)
     # turn into a Message object
     msg = Message(**response["choices"][0]["message"])
     # return the text output and the new conversation
-    print("msg:%s, conversation:%s", msg,  conversation)
-    
+
     return msg.content, conversation + [msg]
 
 class EntityInfos:
@@ -60,4 +57,4 @@ class EntityInfos:
         ]
 
         output, self.conversation = ask_chatgpt_detail(conversation)
-        # replace=True to restart
+        return output
