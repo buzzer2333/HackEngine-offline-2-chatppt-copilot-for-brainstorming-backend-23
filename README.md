@@ -27,18 +27,11 @@ This is an example pet name generator app used in the OpenAI API [quickstart tut
    $ pip install -r requirements.txt
    ```
 
-6. Make a copy of the example environment variables file:
+
+6. Run the app:
 
    ```bash
-   $ cp .env.example .env
+   $ streamlit run main.py
    ```
 
-7. Add your [API key](https://beta.openai.com/account/api-keys) to the newly created `.env` file.
-
-8. Run the app:
-
-   ```bash
-   $ flask run
-   ```
-
-You should now be able to access the app at [http://localhost:5000](http://localhost:5000)! For the full context behind this example app, check out the [tutorial](https://beta.openai.com/docs/quickstart).
+You should now be able to access the app at [http://localhost:8501](http://localhost:8501)! 
