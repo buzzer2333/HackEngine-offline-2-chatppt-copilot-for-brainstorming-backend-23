@@ -13,7 +13,8 @@ from dataclasses import dataclass, asdict
 from textwrap import dedent
 from streamlit_agraph import agraph, Node, Edge, Config
 from service.mapping import MindMap
-from module.message import Message 
+from module.message import Message
+from app import app
 
 # set title of page (will be seen in tab) and the width
 st.set_page_config(page_title="AI Mind Maps", layout="wide")
@@ -60,4 +61,5 @@ def main():
             mindmap.visualize(graph_type)
 
 if __name__ == "__main__":
-    main()
+    # main()
+    app.run()
