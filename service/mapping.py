@@ -12,11 +12,13 @@ import graphviz
 from dataclasses import dataclass, asdict
 from textwrap import dedent
 from streamlit_agraph import agraph, Node, Edge, Config
-from module.message import Message 
+from module.message import Message
 from module.conservation import START_CONVERSATION
+from module.node import NodeData
 
 COLOR = "cyan"
 FOCUS_COLOR = "red"
+
 
 def ask_chatgpt(conversation: List[Message]) -> Tuple[str, List[Message]]:
     response = openai.ChatCompletion.create(
@@ -29,18 +31,21 @@ def ask_chatgpt(conversation: List[Message]) -> Tuple[str, List[Message]]:
     # turn into a Message object
     msg = Message(**response["choices"][0]["message"])
     # return the text output and the new conversation
-    print("msg:%s, conversation:%s", msg,  conversation)
-    
+    print("msg:%s, conversation:%s", msg, conversation)
+
     return msg.content, conversation + [msg]
 
 
 class MindMap:
     """A class that represents a mind map as a graph.
     """
-    
-    def __init__(self, edges: Optional[List[Tuple[str, str]]]=None, nodes: Optional[List[str]]=None) -> None:
-        self.edges = [] if edges is None else edges
-        self.nodes = [] if nodes is None else nodes
+
+    def __init__(self, NodeData=None) -> None:
+        self.root = NodeData
+        self.conversation = []
+        self.map = dict()
+        if NodeData is not None:
+            self.map[NodeData.label] = NodeData
         self.save()
 
     @classmethod
@@ -58,8 +63,8 @@ class MindMap:
         st.session_state["mindmap"] = self
 
     def is_empty(self) -> bool:
-        return len(self.edges) == 0
-    
+        return self.root is None
+
     def ask_for_initial_graph(self, query: str) -> None:
         """Ask GPT-3 to construct a graph from scrach.
 
@@ -80,9 +85,9 @@ class MindMap:
 
         output, self.conversation = ask_chatgpt(conversation)
         # replace=True to restart
-        self.parse_and_include_edges(output, replace=True)
+        self.parse_and_include_edges(output)
 
-    def ask_for_extended_graph(self, selected_node: Optional[str]=None, text: Optional[str]=None) -> None:
+    def ask_for_extended_graph(self, selected_node: Optional[str] = None, text: Optional[str] = None) -> None:
         """Cached helper function to ask GPT-3 to extend the graph.
 
         Args:
@@ -94,22 +99,22 @@ class MindMap:
         """
 
         # do nothing
-        if (selected_node is None and text is None):
+        if selected_node is None and text is None:
             return
 
-        # change description depending on if a node
+        # change description depending on if a node.py
         # was selected or a text description was given
         #
         # note that the conversation is copied (shallowly) instead
         # of modified in place. The reason for this is that if
         # the chatgpt call fails self.conversation will not
         # be updated
-        if selected_node is not None:
-            # prepend a description that this node
+        if selected_node in self.map:
+            # prepend a description that this node.py
             # should be extended
             conversation = self.conversation + [
                 Message(f"""
-                    add new edges to new nodes, starting from the node "{selected_node}"
+                    add new edges to the node "{selected_node}"
                 """, role="user")
             ]
             st.session_state.last_expanded = selected_node
@@ -119,9 +124,9 @@ class MindMap:
 
         # now self.conversation is updated
         output, self.conversation = ask_chatgpt(conversation)
-        self.parse_and_include_edges(output, replace=False)
+        self.parse_and_include_edges(output)
 
-    def parse_and_include_edges(self, output: str, replace: bool=True) -> None:
+    def parse_and_include_edges(self, output: str) -> None:
         """Parse output from LLM (GPT-3) and include the edges in the graph.
 
         Args:
@@ -143,47 +148,36 @@ class MindMap:
         for match in matches:
             op, *args = match
             add = op == "add"
-            if add or (op == "delete" and len(args)==2):
+            if add or (op == "delete" and len(args) == 2):
                 a, b = args
                 if a == b:
                     continue
                 if add:
-                    new_edges.append((a, b))
+                    if a not in self.map:
+                        self.root = NodeData(label=a, id="0")
+                        self.map[a] = self.root
+                    father = self.map[a]
+                    self.map[b] = NodeData(label=b, id=father.id + "-" + (len(father.children) + 1))
+                    father.children.append(self.map[b])
                 else:
-                    # remove both directions
-                    # (undirected graph)
-                    remove_edges.add(frozenset([a, b]))
-            else: # must be delete of node
-                remove_nodes.add(args[0])
+                    pass
+            else:
+                pass
 
-        if replace:
-            edges = new_edges
-        else:
-            edges = self.edges + new_edges
-
-        # make sure edges aren't added twice
-        # and remove nodes/edges that were deleted
-        added = set()
-        for edge in edges:
-            nodes = frozenset(edge)
-            if nodes in added or nodes & remove_nodes or nodes in remove_edges:
-                continue
-            added.add(nodes)
-
-        self.edges = list([tuple(a) for a in added])
-        self.nodes = list(set([n for e in self.edges for n in e]))
         self.save()
 
     def _delete_node(self, node) -> None:
-        """Delete a node and all edges connected to it.
+        """Delete a node.py and all edges connected to it.
 
         Args:
-            node (str): The node to delete.
+            node (str): The node.py to delete.
         """
-        self.edges = [e for e in self.edges if node not in frozenset(e)]
-        self.nodes = list(set([n for e in self.edges for n in e]))
+        # self.edges = [e for e in self.edges if node not in frozenset(e)]
+        # self.nodes = list(set([n for e in self.edges for n in e]))
+        # print(self.edges)
+        # print(self.nodes)
         self.conversation.append(Message(
-            f'delete("{node}")', 
+            f'delete("{node}")',
             role="user"
         ))
         self.save()
@@ -192,14 +186,14 @@ class MindMap:
         st.sidebar.subheader(node)
         cols = st.sidebar.columns(2)
         cols[0].button(
-            label="Expand", 
+            label="Expand",
             on_click=self.ask_for_extended_graph,
             key=f"expand_{node}",
             # pass to on_click (self.ask_for_extended_graph)
             kwargs={"selected_node": node}
         )
         cols[1].button(
-            label="Delete", 
+            label="Delete",
             on_click=self._delete_node,
             type="primary",
             key=f"delete_{node}",
@@ -214,33 +208,33 @@ class MindMap:
             graph_type (Literal["agraph", "networkx", "graphviz"]): The graph type to visualize the mindmap as.
         Returns:
             Union[str, None]: Any output from the clicking the graph or 
-                if selecting a node in the sidebar.
+                if selecting a node.py in the sidebar.
         """
 
         selected = st.session_state.get("last_expanded")
         if graph_type == "agraph":
             vis_nodes = [
                 Node(
-                    id=n, 
-                    label=n, 
+                    id=n,
+                    label=n,
                     # a little bit bigger if selected
-                    size=10+10*(n==selected), 
+                    size=10 + 10 * (n == selected),
                     # a different color if selected
                     color=COLOR if n != selected else FOCUS_COLOR
-                ) 
+                )
                 for n in self.nodes
             ]
             vis_edges = [Edge(source=a, target=b) for a, b in self.edges]
             config = Config(width="100%",
                             height=600,
-                            directed=False, 
+                            directed=False,
                             physics=True,
                             hierarchical=False,
                             )
-            # returns a node if clicked, otherwise None
-            clicked_node = agraph(nodes=vis_nodes, 
-                            edges=vis_edges, 
-                            config=config)
+            # returns a node.py if clicked, otherwise None
+            clicked_node = agraph(nodes=vis_nodes,
+                                  edges=vis_edges,
+                                  config=config)
             # if clicked, update the sidebar with a button to create it
             if clicked_node is not None:
                 self._add_expand_delete_buttons(clicked_node)
@@ -251,17 +245,17 @@ class MindMap:
                 graph.add_edge(a, b)
             colors = [FOCUS_COLOR if node == selected else COLOR for node in graph]
             fig, _ = plt.subplots(figsize=(16, 16))
-            pos = nx.spring_layout(graph, seed = 123)
+            pos = nx.spring_layout(graph, seed=123)
             nx.draw(graph, pos=pos, node_color=colors, with_labels=True)
             st.pyplot(fig)
-        else: # graph_type == "graphviz":
+        else:  # graph_type == "graphviz":
             graph = graphviz.Graph()
             graph.attr(rankdir='LR')
             for a, b in self.edges:
                 graph.edge(a, b, dir="both")
             for n in self.nodes:
                 graph.node(n, style="filled", fillcolor=FOCUS_COLOR if n == selected else COLOR)
-            #st.graphviz_chart(graph, use_container_width=True)
+            # st.graphviz_chart(graph, use_container_width=True)
             b64 = base64.b64encode(graph.pipe(format='svg')).decode("utf-8")
             html = f"<img style='width: 100%' src='data:image/svg+xml;base64,{b64}'/>"
             st.write(html, unsafe_allow_html=True)

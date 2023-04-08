@@ -19,7 +19,8 @@ START_CONVERSATION = [
         nothing else. If the instructions are vague or even if only a single word is provided, 
         still generate a graph of multiple nodes and edges that that could makes sense in the 
         situation. Remember to think step by step and debate pros and cons before settling on 
-        an answer to accomplish the request as well as possible.
+        an answer to accomplish the request as well as possible. Also, the graph is disconnected.
+        Node names should be in Chinese as much as possible.
 
         Here is my first request: Add a mind map about machine learning.
     """, role="user"),
