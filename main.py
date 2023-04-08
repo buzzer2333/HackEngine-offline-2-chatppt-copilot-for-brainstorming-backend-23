@@ -12,7 +12,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def test_entity_info():
     entity = EntityInfos()
-    output = entity.ask_for_more_detail("产品的商用化前景")
+    output = entity.ask_for_more_detail("产品的商用化前景", "1")
     Log.infof("%s", output)
 
 

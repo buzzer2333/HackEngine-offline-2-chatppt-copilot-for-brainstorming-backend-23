@@ -39,7 +39,7 @@ class EntityInfos:
         # save to session state
         st.session_state["entityInfos"] = self
 
-    def ask_for_more_detail(self, query: str) -> None:
+    def ask_for_more_detail(self, query: str, nodeID: str) -> None:
         """Ask GPT-3 to construct a graph from scrach.
 
         Args:
@@ -57,4 +57,5 @@ class EntityInfos:
         ]
 
         output, self.conversation = ask_chatgpt_detail(conversation)
+        self.nodesInfo[nodeID] = output
         return output
