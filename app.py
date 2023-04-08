@@ -7,6 +7,7 @@ from controller.map import map_blue
 # 初始化flask app
 app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
+app.secret_key = "hackthon-20230408"
 app.register_blueprint(blueprint=map_blue)
 
 

@@ -17,7 +17,7 @@ def test_entity_info():
 
 
 if __name__ == "__main__":
-    # app.run()
-    test_entity_info()
+    app.run()
+    # test_entity_info()
 
 

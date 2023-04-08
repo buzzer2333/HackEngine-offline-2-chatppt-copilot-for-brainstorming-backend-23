@@ -157,7 +157,7 @@ class MindMap:
                         self.root = NodeData(label=a, id="0")
                         self.map[a] = self.root
                     father = self.map[a]
-                    self.map[b] = NodeData(label=b, id=father.id + "-" + (len(father.children) + 1))
+                    self.map[b] = NodeData(label=b, id=father.id + "-" + str((len(father.children) + 1)))
                     father.children.append(self.map[b])
                 else:
                     pass
