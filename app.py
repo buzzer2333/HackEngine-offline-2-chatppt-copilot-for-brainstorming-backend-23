@@ -9,8 +9,6 @@ app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
 app.register_blueprint(blueprint=map_blue)
 
-# todo:: open_api_key
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 # return index.html
