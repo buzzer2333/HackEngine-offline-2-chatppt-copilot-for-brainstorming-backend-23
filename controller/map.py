@@ -4,6 +4,7 @@ from log import Log
 from flask import request, jsonify, Blueprint, session, make_response
 from service.mapping import MindMap, default
 from service.detail import EntityInfos
+from service.mapping2 import MindMap2
 
 map_blue = Blueprint("map", __name__)
 
@@ -43,6 +44,23 @@ def expand():
     return rsp
 
 
+# 扩展头脑风暴图的某个节点
+@map_blue.route("/v2/expand", methods=["POST"])
+def expand_v2():
+    # todo :: biz
+    selected_node = request.json.get("selected_node")
+    text = request.json.get("text")
+    manual = bool(request.json.get("manual"))
+
+    userid = get_user_id()
+    m = user2map[userid]
+    re = m.ask_for_extended_graph(selected_node=selected_node, text=text, manual=manual)
+
+    rsp = make_response(json.dumps(re))
+    rsp.headers["Content-Type"] = "application/json; charset=utf-8"
+    return rsp
+
+
 # 初始化头脑风暴图
 @map_blue.route("/init", methods=["POST"])
 def init():
@@ -55,7 +73,26 @@ def init():
     userid = get_user_id()
     user2map[userid] = m
     Log.infof("get user2Map as %s", user2map)
+
     rsp = make_response(json.dumps({"data": m.root, "code": 0}, default=default))
+    rsp.headers["Content-Type"] = "application/json; charset=utf-8"
+    return rsp
+
+
+# 初始化头脑风暴图2
+@map_blue.route("/v2/init", methods=["POST"])
+def init_v2():
+    query = request.json.get("query")
+    Log.infof("get query as %s", query)
+    m = MindMap2()
+    re = m.ask_for_initial_graph(query)
+
+    # 存储用户mindMap
+    userid = get_user_id()
+    user2map[userid] = m
+    Log.infof("get user2Map as %s", user2map)
+
+    rsp = make_response(json.dumps(re))
     rsp.headers["Content-Type"] = "application/json; charset=utf-8"
     return rsp
 
