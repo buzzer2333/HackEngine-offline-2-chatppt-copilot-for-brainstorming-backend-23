@@ -17,7 +17,7 @@ def test_entity_info():
 
 
 if __name__ == "__main__":
-    app.run(port=os.getenv("PORT", default=5000), host='0.0.0.0')
+    app.run()
     # test_entity_info()
 
 
