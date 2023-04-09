@@ -29,11 +29,11 @@ def ask_chatgpt(conversation: List[Message]) -> Tuple[str, List[Message]]:
         messages=[asdict(c) for c in conversation]
     )
 
-    print("response:", response)
+    # print("response:", response)
     # turn into a Message object
     msg = Message(**response["choices"][0]["message"])
     # return the text output and the new conversation
-    print("msg:%s, conversation:%s", msg, conversation)
+    # print("msg:%s, conversation:%s", msg, conversation)
 
     return msg.content, conversation + [msg]
 
@@ -156,7 +156,7 @@ class MindMap:
             replace (bool, optional): if True, replace all edges with the new ones, 
                 otherwise add to existing edges. Defaults to True.
         """
-        print(output)
+        # print(output)
         # Regex patterns
         pattern1 = r'(add|delete)\("([^()"]+)",\s*"([^()"]+)"\)'
         pattern2 = r'(delete)\("([^()"]+)"\)'
@@ -183,7 +183,7 @@ class MindMap:
             else:
                 pass
 
-        print(self.root)
+        # print(self.root)
         # self.save()
 
     # def _delete_node(self, node) -> None:

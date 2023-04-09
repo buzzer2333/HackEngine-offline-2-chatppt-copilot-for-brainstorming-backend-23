@@ -26,11 +26,11 @@ def ask_chatgpt(conversation: List[Message]) -> Tuple[str, List[Message]]:
         messages=[asdict(c) for c in conversation]
     )
 
-    print("response:", response)
+    # print("response:", response)
     # turn into a Message object
     msg = Message(**response["choices"][0]["message"])
     # return the text output and the new conversation
-    print("msg:%s, conversation:%s", msg, conversation)
+    # print("msg:%s, conversation:%s", msg, conversation)
 
     return msg.content, conversation + [msg]
 
@@ -43,7 +43,7 @@ def parse_and_include_edges(output: str) -> []:
         replace (bool, optional): if True, replace all edges with the new ones,
             otherwise add to existing edges. Defaults to True.
     """
-    print(output)
+    # print(output)
     # Regex patterns
     pattern = r'(add)\("([^()"]+)",\s*"([^()"]+)"\)'
 
@@ -62,7 +62,7 @@ def parse_and_include_edges(output: str) -> []:
         else:
             pass
 
-    print(result)
+    # print(result)
     return result
 
 
