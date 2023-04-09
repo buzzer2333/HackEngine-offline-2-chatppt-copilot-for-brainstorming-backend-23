@@ -136,17 +136,20 @@ def init_v2():
 
 
 # 获取某个节点的相关信息
-@map_blue.route("/detail", methods=["GET", "OPTIONS"])
+@map_blue.route("/detail", methods=["GET", "OPTIONS", "POST"])
 def detail():
     if request.method == "OPTIONS":
         rsp = make_response()
         add_header(rsp)
         return rsp
-
-    node_id = request.args.get("id")
-    node_label = request.args.get("label")
-    query = request.args.get("query")
-    Log.infof("get id as %s, label as %s", node_id, node_label)
+    node_id = request.json.get("id")
+    node_label = request.json.get("label")
+    query = request.json.get("query")
+    if request.method == "GET":
+        node_id = request.args.get("id")
+        node_label = request.args.get("label")
+        query = request.args.get("query")
+    Log.infof("get id as %s, label as %s, query as %s", node_id, node_label, query)
 
     user_id = get_user_id()
     if user_id not in user2info:
