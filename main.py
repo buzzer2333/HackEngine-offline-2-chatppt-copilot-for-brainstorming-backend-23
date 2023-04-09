@@ -1,17 +1,13 @@
 from __future__ import annotations
-
-import json
 import os
 import openai
 
-import module.node as node
 from service.detail import EntityInfos
-from service.mapping import MindMap, default
+from service.mapping import MindMap
 from app import app
 from log import Log
 # todo:: open_api_key
-openai.api_key = "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"
-# openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 def test_entity_info():
@@ -21,10 +17,7 @@ def test_entity_info():
 
 
 if __name__ == "__main__":
-    n = node.NodeData(id="0", label="123")
-    n.children.append(node.NodeData(id="0", label="123"))
-    print(json.dumps(n, default=default))
-    app.run()
+     app.run(debug=True, port=os.getenv("PORT", default=5000), host='0.0.0.0')
     # test_entity_info()
 
 
