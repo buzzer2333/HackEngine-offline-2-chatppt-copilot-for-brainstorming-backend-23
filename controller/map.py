@@ -1,7 +1,7 @@
 import json
 from log import Log
-from flask import request, jsonify, Blueprint, session
-from service.mapping import MindMap
+from flask import request, jsonify, Blueprint, session, make_response
+from service.mapping import MindMap, default
 
 map_blue = Blueprint("map", __name__)
 
@@ -16,14 +16,15 @@ def expand():
 
 @map_blue.route("/init", methods=["POST"])
 def init():
-    str = request.get_data()
-    Log.infof("get input as %s", str)
+    input = request.get_data()
+    Log.infof("get input as %s", input)
     m = MindMap()
-    session['map'] = m
-    m.ask_for_initial_graph(str)
-    Log.infof("get root as %s", m.root.label)
-    Log.infof("get rsp as %s", [x.label for x in m.root])
-    jsonify(m.root)
+    # todo:: session里面只能放可以序列化的东西，所以很迷醉，不能直接把minMap放在session里面
+    # session['map'] = m
+    m.ask_for_initial_graph(input)
+    rsp = make_response(json.dumps(m.root, default=default))
+    rsp.headers["Content-Type"] = "application/json; charset=utf-8"
+    return rsp
 
 @map_blue.route("/detail", methods=["POST"])
 def detail():

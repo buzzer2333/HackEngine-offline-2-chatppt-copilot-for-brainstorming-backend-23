@@ -40,13 +40,13 @@ class MindMap:
     """A class that represents a mind map as a graph.
     """
 
-    def __init__(self, NodeData=None) -> None:
-        self.root = NodeData
+    def __init__(self, nodeData=None) -> None:
+        self.root = nodeData
         self.conversation = []
         self.map = dict()
-        if NodeData is not None:
-            self.map[NodeData.label] = NodeData
-        self.save()
+        if nodeData is not None:
+            self.map[nodeData.label] = nodeData
+        # self.save()
 
     @classmethod
     def load(cls) -> MindMap:
@@ -59,8 +59,9 @@ class MindMap:
         return cls()
 
     def save(self) -> None:
+        pass
         # save to session state
-        st.session_state["mindmap"] = self
+        # st.session_state["mindmap"] = self
 
     def is_empty(self) -> bool:
         return self.root is None
@@ -142,9 +143,6 @@ class MindMap:
         # Find all matches in the text
         matches = re.findall(pattern1, output) + re.findall(pattern2, output)
 
-        new_edges = []
-        remove_edges = set()
-        remove_nodes = set()
         for match in matches:
             op, *args = match
             add = op == "add"
@@ -164,101 +162,108 @@ class MindMap:
             else:
                 pass
 
-        self.save()
+        print(self.root)
+        # self.save()
 
-    def _delete_node(self, node) -> None:
-        """Delete a node.py and all edges connected to it.
+    # def _delete_node(self, node) -> None:
+    #     """Delete a node.py and all edges connected to it.
+    #
+    #     Args:
+    #         node (str): The node.py to delete.
+    #     """
+    #     # self.edges = [e for e in self.edges if node not in frozenset(e)]
+    #     # self.nodes = list(set([n for e in self.edges for n in e]))
+    #     # print(self.edges)
+    #     # print(self.nodes)
+    #     self.conversation.append(Message(
+    #         f'delete("{node}")',
+    #         role="user"
+    #     ))
+    #     self.save()
 
-        Args:
-            node (str): The node.py to delete.
-        """
-        # self.edges = [e for e in self.edges if node not in frozenset(e)]
-        # self.nodes = list(set([n for e in self.edges for n in e]))
-        # print(self.edges)
-        # print(self.nodes)
-        self.conversation.append(Message(
-            f'delete("{node}")',
-            role="user"
-        ))
-        self.save()
+    # def _add_expand_delete_buttons(self, node) -> None:
+    #     st.sidebar.subheader(node)
+    #     cols = st.sidebar.columns(2)
+    #     cols[0].button(
+    #         label="Expand",
+    #         on_click=self.ask_for_extended_graph,
+    #         key=f"expand_{node}",
+    #         # pass to on_click (self.ask_for_extended_graph)
+    #         kwargs={"selected_node": node}
+    #     )
+    #     cols[1].button(
+    #         label="Delete",
+    #         on_click=self._delete_node,
+    #         type="primary",
+    #         key=f"delete_{node}",
+    #         # pass on to _delete_node
+    #         args=(node,)
+    #     )
 
-    def _add_expand_delete_buttons(self, node) -> None:
-        st.sidebar.subheader(node)
-        cols = st.sidebar.columns(2)
-        cols[0].button(
-            label="Expand",
-            on_click=self.ask_for_extended_graph,
-            key=f"expand_{node}",
-            # pass to on_click (self.ask_for_extended_graph)
-            kwargs={"selected_node": node}
-        )
-        cols[1].button(
-            label="Delete",
-            on_click=self._delete_node,
-            type="primary",
-            key=f"delete_{node}",
-            # pass on to _delete_node
-            args=(node,)
-        )
+    # def visualize(self, graph_type: Literal["agraph", "networkx", "graphviz"]) -> None:
+    #     """Visualize the mindmap as a graph a certain way depending on the `graph_type`.
+    #
+    #     Args:
+    #         graph_type (Literal["agraph", "networkx", "graphviz"]): The graph type to visualize the mindmap as.
+    #     Returns:
+    #         Union[str, None]: Any output from the clicking the graph or
+    #             if selecting a node.py in the sidebar.
+    #     """
+    #
+    #     selected = st.session_state.get("last_expanded")
+    #     if graph_type == "agraph":
+    #         vis_nodes = [
+    #             Node(
+    #                 id=n,
+    #                 label=n,
+    #                 # a little bit bigger if selected
+    #                 size=10 + 10 * (n == selected),
+    #                 # a different color if selected
+    #                 color=COLOR if n != selected else FOCUS_COLOR
+    #             )
+    #             for n in self.nodes
+    #         ]
+    #         vis_edges = [Edge(source=a, target=b) for a, b in self.edges]
+    #         config = Config(width="100%",
+    #                         height=600,
+    #                         directed=False,
+    #                         physics=True,
+    #                         hierarchical=False,
+    #                         )
+    #         # returns a node.py if clicked, otherwise None
+    #         clicked_node = agraph(nodes=vis_nodes,
+    #                               edges=vis_edges,
+    #                               config=config)
+    #         # if clicked, update the sidebar with a button to create it
+    #         if clicked_node is not None:
+    #             self._add_expand_delete_buttons(clicked_node)
+    #         return
+    #     if graph_type == "networkx":
+    #         graph = nx.Graph()
+    #         for a, b in self.edges:
+    #             graph.add_edge(a, b)
+    #         colors = [FOCUS_COLOR if node == selected else COLOR for node in graph]
+    #         fig, _ = plt.subplots(figsize=(16, 16))
+    #         pos = nx.spring_layout(graph, seed=123)
+    #         nx.draw(graph, pos=pos, node_color=colors, with_labels=True)
+    #         st.pyplot(fig)
+    #     else:  # graph_type == "graphviz":
+    #         graph = graphviz.Graph()
+    #         graph.attr(rankdir='LR')
+    #         for a, b in self.edges:
+    #             graph.edge(a, b, dir="both")
+    #         for n in self.nodes:
+    #             graph.node(n, style="filled", fillcolor=FOCUS_COLOR if n == selected else COLOR)
+    #         # st.graphviz_chart(graph, use_container_width=True)
+    #         b64 = base64.b64encode(graph.pipe(format='svg')).decode("utf-8")
+    #         html = f"<img style='width: 100%' src='data:image/svg+xml;base64,{b64}'/>"
+    #         st.write(html, unsafe_allow_html=True)
+    #     # sort alphabetically
+    #     for node in sorted(self.nodes):
+    #         self._add_expand_delete_buttons(node)
 
-    def visualize(self, graph_type: Literal["agraph", "networkx", "graphviz"]) -> None:
-        """Visualize the mindmap as a graph a certain way depending on the `graph_type`.
-
-        Args:
-            graph_type (Literal["agraph", "networkx", "graphviz"]): The graph type to visualize the mindmap as.
-        Returns:
-            Union[str, None]: Any output from the clicking the graph or 
-                if selecting a node.py in the sidebar.
-        """
-
-        selected = st.session_state.get("last_expanded")
-        if graph_type == "agraph":
-            vis_nodes = [
-                Node(
-                    id=n,
-                    label=n,
-                    # a little bit bigger if selected
-                    size=10 + 10 * (n == selected),
-                    # a different color if selected
-                    color=COLOR if n != selected else FOCUS_COLOR
-                )
-                for n in self.nodes
-            ]
-            vis_edges = [Edge(source=a, target=b) for a, b in self.edges]
-            config = Config(width="100%",
-                            height=600,
-                            directed=False,
-                            physics=True,
-                            hierarchical=False,
-                            )
-            # returns a node.py if clicked, otherwise None
-            clicked_node = agraph(nodes=vis_nodes,
-                                  edges=vis_edges,
-                                  config=config)
-            # if clicked, update the sidebar with a button to create it
-            if clicked_node is not None:
-                self._add_expand_delete_buttons(clicked_node)
-            return
-        if graph_type == "networkx":
-            graph = nx.Graph()
-            for a, b in self.edges:
-                graph.add_edge(a, b)
-            colors = [FOCUS_COLOR if node == selected else COLOR for node in graph]
-            fig, _ = plt.subplots(figsize=(16, 16))
-            pos = nx.spring_layout(graph, seed=123)
-            nx.draw(graph, pos=pos, node_color=colors, with_labels=True)
-            st.pyplot(fig)
-        else:  # graph_type == "graphviz":
-            graph = graphviz.Graph()
-            graph.attr(rankdir='LR')
-            for a, b in self.edges:
-                graph.edge(a, b, dir="both")
-            for n in self.nodes:
-                graph.node(n, style="filled", fillcolor=FOCUS_COLOR if n == selected else COLOR)
-            # st.graphviz_chart(graph, use_container_width=True)
-            b64 = base64.b64encode(graph.pipe(format='svg')).decode("utf-8")
-            html = f"<img style='width: 100%' src='data:image/svg+xml;base64,{b64}'/>"
-            st.write(html, unsafe_allow_html=True)
-        # sort alphabetically
-        for node in sorted(self.nodes):
-            self._add_expand_delete_buttons(node)
+def default(o):
+    if isinstance(o, NodeData):
+        return o.to_json()
+    if isinstance(o, MindMap):
+        return ""
