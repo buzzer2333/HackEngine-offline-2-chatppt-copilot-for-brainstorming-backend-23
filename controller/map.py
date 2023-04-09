@@ -5,6 +5,8 @@ from service.mapping import MindMap, default
 
 map_blue = Blueprint("map", __name__)
 
+# uuid -> mindMap
+user2map = dict()
 
 @map_blue.route("/expand", methods=["POST"])
 def expand():
@@ -19,9 +21,16 @@ def init():
     input = request.get_data()
     Log.infof("get input as %s", input)
     m = MindMap()
-    # todo:: session里面只能放可以序列化的东西，所以很迷醉，不能直接把minMap放在session里面
-    # session['map'] = m
     m.ask_for_initial_graph(input)
+
+    # 存储用户mindMap
+    uuid = session['user_id']
+    if uuid is None:
+        Log.errorf("get user id failed")
+        return jsonify({"err":"get user info failed"})
+    Log.infof("get user id as %s", uuid)
+    user2map[uuid] = m
+    Log.infof("get user2Map as %s", user2map)
     rsp = make_response(json.dumps(m.root, default=default))
     rsp.headers["Content-Type"] = "application/json; charset=utf-8"
     return rsp

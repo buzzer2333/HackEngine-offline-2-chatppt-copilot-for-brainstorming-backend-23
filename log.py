@@ -5,6 +5,11 @@ logging.basicConfig(level=logging.INFO)
 
 class Log:
     @classmethod
-    def infof(cls, format, *args):
-        msg = format % args
+    def infof(cls, fmt, *args):
+        msg = fmt % args
         logging.info(msg)
+
+    @classmethod
+    def errorf(cls, fmt, *args):
+        msg = fmt % args
+        logging.error(msg)
