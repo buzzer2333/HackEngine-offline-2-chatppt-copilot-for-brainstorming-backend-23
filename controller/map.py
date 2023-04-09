@@ -30,13 +30,13 @@ def get_user_id() -> str:
 @map_blue.route("/expand", methods=["POST"])
 def expand():
     # todo :: biz
-    params = request.get_data()
-    params = json.loads(params)
-    Log.infof("get input as %s", json.dumps(params))
+    selected_node = request.json.get("selected_node")
+    text = request.json.get("text")
+    manual = bool(request.json.get("manual"))
 
     userid = get_user_id()
     m = user2map[userid]
-    m.ask_for_extended_graph(selected_node=params["selected_node"], text=params["text"], manual=bool(params["manual"]))
+    m.ask_for_extended_graph(selected_node=selected_node, text=text, manual=manual)
 
     rsp = make_response(json.dumps(m.root, default=default))
     rsp.headers["Content-Type"] = "application/json; charset=utf-8"
