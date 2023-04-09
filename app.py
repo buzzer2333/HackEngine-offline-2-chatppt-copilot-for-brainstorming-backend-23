@@ -1,7 +1,7 @@
 import uuid
 import logging
 
-from flask import Flask, redirect, render_template, request, url_for, session
+from flask import Flask, request, jsonify, session
 from controller.map import map_blue
 from log import Log
 
@@ -26,4 +26,4 @@ def index():
         # session["map"] =
     user_id = session["user_id"]
     Log.infof("already has user_id as %s", user_id)
-    return redirect(url_for("init"))
+    return app.send_static_file("mind_map_test.html")

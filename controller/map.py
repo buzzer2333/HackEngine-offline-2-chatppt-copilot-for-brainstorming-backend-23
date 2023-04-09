@@ -41,7 +41,7 @@ def expand():
     return rsp
 
 
-@map_blue.route("/init", methods=["GET", "POST"])
+@map_blue.route("/init", methods=["POST"])
 def init():
     inputs = request.get_data()
     Log.infof("get inputs as %s", inputs)
