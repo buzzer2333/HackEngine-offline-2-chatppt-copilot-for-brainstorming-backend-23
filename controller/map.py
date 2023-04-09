@@ -40,9 +40,17 @@ def expand():
     m.ask_for_extended_graph(selected_node=selected_node, text=text, manual=manual)
 
     rsp = make_response(json.dumps(m.root, default=default))
+    add_header(rsp)
+    return rsp
+
+
+def add_header(rsp):
     rsp.headers["Content-Type"] = "application/json; charset=utf-8"
     rsp.headers["Access-Control-Allow-Origin"] = "*"
-    return rsp
+    rsp.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+    rsp.headers["Access-Control-Allow-Headers"] = "X-PINGOTHER, Content-Type"
+    rsp.headers["Access-Control-Max-Age"] = 86400
+    rsp.headers["Vary"] = "Accept-Encoding, Origin"
 
 
 # 扩展头脑风暴图的某个节点
@@ -58,8 +66,7 @@ def expand_v2():
     re = m.ask_for_extended_graph(selected_node=selected_node, text=text, manual=manual)
 
     rsp = make_response(json.dumps(re))
-    rsp.headers["Content-Type"] = "application/json; charset=utf-8"
-    rsp.headers["Access-Control-Allow-Origin"] = "*"
+    add_header(rsp)
     return rsp
 
 
@@ -77,8 +84,7 @@ def init():
     Log.infof("get user2Map as %s", user2map)
 
     rsp = make_response(json.dumps({"data": m.root, "code": 0}, default=default))
-    rsp.headers["Content-Type"] = "application/json; charset=utf-8"
-    rsp.headers["Access-Control-Allow-Origin"] = "*"
+    add_header(rsp)
     return rsp
 
 
@@ -96,8 +102,7 @@ def init_v2():
     Log.infof("get user2Map as %s", user2map)
 
     rsp = make_response(json.dumps(re))
-    rsp.headers["Content-Type"] = "application/json; charset=utf-8"
-    rsp.headers["Access-Control-Allow-Origin"] = "*"
+    add_header(rsp)
     return rsp
 
 
@@ -116,6 +121,5 @@ def detail():
     else:
         output = user2info[user_id].ask_for_more_detail(query, node_id)
     rsp = make_response(jsonify({"data": output, "code": 0}))
-    rsp.headers["Content-Type"] = "application/json; charset=utf-8"
-    rsp.headers["Access-Control-Allow-Origin"] = "*"
+    add_header(rsp)
     return rsp
