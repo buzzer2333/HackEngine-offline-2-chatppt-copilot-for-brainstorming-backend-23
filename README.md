@@ -1,9 +1,12 @@
 # copilot-for-brainstorming (backend)
 
-This is an intelligent tool powered by [ChatGPT](https://beta.openai.com/docs/quickstart). 
+## Intro
+
+This is an intelligent tool powered by [ChatGPT](https://beta.openai.com/docs/quickstart). It is designed to expand human minds as a copilot, especially in brainstorming scenes.
+
 Feel free to try it [here](https://copilot-for-brainstorm.zeabur.app/)
 
-This repo is the backend of the project.
+> This repo is the backend of the project.
 
 ## Setup
 
