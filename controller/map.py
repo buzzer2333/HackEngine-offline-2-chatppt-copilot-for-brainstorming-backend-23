@@ -132,7 +132,7 @@ def init_v2():
     re = m.ask_for_initial_graph(query)
     Log.infof("get user2Map as %s", user2map)
 
-    rsp = make_response({"data": json.dumps(re), "uid": userid})
+    rsp = make_response(json.dumps({"data": re, "uid": userid}))
     Log.infof("return as %s", rsp)
     add_header(rsp)
     return rsp
