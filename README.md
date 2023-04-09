@@ -1,6 +1,9 @@
-# OpenAI API Quickstart - Python example app
+# copilot-for-brainstorming (backend)
 
-This is an example pet name generator app used in the OpenAI API [quickstart tutorial](https://beta.openai.com/docs/quickstart). It uses the [Flask](https://flask.palletsprojects.com/en/2.0.x/) web framework. Check out the tutorial or follow the instructions below to get set up.
+This is an intelligent tool powered by [ChatGPT](https://beta.openai.com/docs/quickstart). 
+Feel free to try it [here](https://copilot-for-brainstorm.zeabur.app/)
+
+This repo is the backend of the project.
 
 ## Setup
 
@@ -31,7 +34,5 @@ This is an example pet name generator app used in the OpenAI API [quickstart tut
 6. Run the app:
 
    ```bash
-   $ streamlit run main.py
+   $ python main.py
    ```
-
-You should now be able to access the app at [http://localhost:8501](http://localhost:8501)! 
