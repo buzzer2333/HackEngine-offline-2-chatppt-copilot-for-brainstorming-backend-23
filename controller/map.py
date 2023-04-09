@@ -154,10 +154,10 @@ def detail():
     user_id = get_user_id()
     if user_id not in user2info:
         entity_info = EntityInfos()
-        output = entity_info.ask_for_more_detail(query, node_id)
+        output = entity_info.ask_for_more_detail(query, node_id, new=True)
         user2info[user_id] = entity_info
     else:
-        output = user2info[user_id].ask_for_more_detail(query, node_id)
+        output = user2info[user_id].ask_for_more_detail(query, node_id, new=False)
 
     rsp = make_response(jsonify({"data": output, "code": 0}))
     add_header(rsp)

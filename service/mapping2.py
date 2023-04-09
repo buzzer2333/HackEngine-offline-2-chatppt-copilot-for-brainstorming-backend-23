@@ -22,7 +22,6 @@ from module.node import NodeData
 def ask_chatgpt(conversation: str) -> Tuple[str, str]:
     response = openai.Completion.create(
         model="text-davinci-003",
-        # asdict comes from `from dataclasses import asdict`
         prompt=conversation,
         temperature=0.9,
         max_tokens=1500,
@@ -32,12 +31,7 @@ def ask_chatgpt(conversation: str) -> Tuple[str, str]:
         stop=[" Human:", " AI:"]
     )
 
-    # print("response:", response)
-    # turn into a Message object
     msg = response["choices"][0]["text"]
-    # return the text output and the new conversation
-    # print("msg:%s, conversation:%s", msg, conversation)
-
     return msg, conversation + msg
 
 
@@ -49,7 +43,6 @@ def parse_and_include_edges(output: str) -> []:
         replace (bool, optional): if True, replace all edges with the new ones,
             otherwise add to existing edges. Defaults to True.
     """
-    # print(output)
     # Regex patterns
     pattern = r'(add)\("([^()"]+)",\s*"([^()"]+)"\)'
 
