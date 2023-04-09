@@ -1,35 +1,29 @@
-import os
+import uuid
+import logging
 
-import openai
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, request, jsonify, session
+from controller.map import map_blue
+from log import Log
 
+# 初始化flask app
 app = Flask(__name__)
-openai.api_key = os.getenv("OPENAI_API_KEY")
+app.logger.setLevel(logging.INFO)
+app.secret_key = "hackthon-20230408"
+app.register_blueprint(blueprint=map_blue)
 
 
-@app.route("/", methods=("GET", "POST"))
+# return index.html
+@app.route("/666", methods=["GET", "POST"])
 def index():
-    if request.method == "POST":
-        animal = request.form["animal"]
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=generate_prompt(animal),
-            temperature=0.6,
-        )
-        return redirect(url_for("index", result=response.choices[0].text))
-
-    result = request.args.get("result")
-    return render_template("index.html", result=result)
-
-
-def generate_prompt(animal):
-    return """Suggest three names for an animal that is a superhero.
-
-Animal: Cat
-Names: Captain Sharpclaw, Agent Fluffball, The Incredible Feline
-Animal: Dog
-Names: Ruff the Protector, Wonder Canine, Sir Barks-a-Lot
-Animal: {}
-Names:""".format(
-        animal.capitalize()
-    )
+    if session.get("user_id") is None:
+        # 这里是假设用户只会从/路由进入应用
+        # 生成随机数标识用户
+        user_id = uuid.uuid4()
+        print(user_id)
+        Log.infof("get user_id as %s", user_id)
+        session["user_id"] = user_id
+        # todo:: session model
+        # session["map"] =
+    user_id = session["user_id"]
+    Log.infof("already has user_id as %s", user_id)
+    return app.send_static_file("mind_map_test.html")
