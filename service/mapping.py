@@ -12,6 +12,8 @@ import graphviz
 from dataclasses import dataclass, asdict
 from textwrap import dedent
 from streamlit_agraph import agraph, Node, Edge, Config
+
+from log import Log
 from module.message import Message
 from module.conservation import START_CONVERSATION
 from module.node import NodeData
@@ -88,19 +90,35 @@ class MindMap:
         # replace=True to restart
         self.parse_and_include_edges(output)
 
-    def ask_for_extended_graph(self, selected_node: Optional[str] = None, text: Optional[str] = None) -> None:
+    def ask_for_extended_graph(self, selected_node: Optional[str] = None, text: Optional[str] = None,
+                               manual=False) -> None:
         """Cached helper function to ask GPT-3 to extend the graph.
 
         Args:
-            query (str): query to ask GPT-3 about
+            query (str): query to ask GPT-3 abouty
             edges_as_text (str): edges formatted as text
 
         Returns:
             str: GPT-3 output
         """
 
-        # do nothing
-        if selected_node is None and text is None:
+        if selected_node not in self.map and text is None and not manual:
+            Log.errorf("params error")
+            return
+
+        if manual:
+            if selected_node not in self.map or text is None:
+                Log.errorf("params error")
+                return
+            output = f"""
+                add("{selected_node}","{text}")
+            """
+            self.conversation.append(Message(
+                output,
+                role="user"
+            ))
+            self.parse_and_include_edges(output)
+            # self.save()
             return
 
         # change description depending on if a node.py
@@ -261,6 +279,7 @@ class MindMap:
     #     # sort alphabetically
     #     for node in sorted(self.nodes):
     #         self._add_expand_delete_buttons(node)
+
 
 def default(o):
     if isinstance(o, NodeData):

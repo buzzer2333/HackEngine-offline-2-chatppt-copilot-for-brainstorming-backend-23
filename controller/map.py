@@ -31,10 +31,17 @@ def expand():
     params = request.get_data()
     params = json.loads(params)
     Log.infof("get input as %s", json.dumps(params))
-    return jsonify(params)
+
+    userid = get_user_id()
+    m = user2map[userid]
+    m.ask_for_extended_graph(selected_node=params["selected_node"], text=params["text"], manual=bool(params["manual"]))
+
+    rsp = make_response(json.dumps(m.root, default=default))
+    rsp.headers["Content-Type"] = "application/json; charset=utf-8"
+    return rsp
 
 
-@map_blue.route("/init", methods=["POST"])
+@map_blue.route("/init", methods=["GET", "POST"])
 def init():
     inputs = request.get_data()
     Log.infof("get inputs as %s", inputs)
