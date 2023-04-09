@@ -1,4 +1,5 @@
-from module.message import Message 
+from module.message import Message
+
 START_CONVERSATION = [
     Message("""
         You are a useful mind map/undirected graph-generating AI that can generate mind maps
@@ -100,21 +101,16 @@ START_CONVERSATION2 = """
         add("闲聊", "美食")
 """
 
+DETAIL_CONVERSATION = """
+        你是一个行业专家你可以回答行业专业问题。
 
-DETAIL_CONVERSATION = [
-    Message("""
-        你是一个行业专家你可以回答行业专业问题
-    """, role="system"),
-    Message("""
-        如果我要做空气净化功能，我的目标用户群体可以是谁
-    """, role="user"),
-    Message("""
-    空气净化功能可以吸引多种用户群体，例如：
+        Human: 如果我要做空气净化功能，我的目标用户群体可以是谁？
+
+        AI: 空气净化功能可以吸引多种用户群体，例如：
         对空气质量有高要求的人群：例如患有哮喘或过敏症的人，他们需要在车内呼吸到干净的空气以避免过敏反应。
         车辆长时间停放在封闭环境内的用户：例如停在车库或地下停车场的车辆，车内空气可能会污染，使用空气净化功能可以有效净化空气，使车内环境更加健康。
         家庭有婴幼儿的用户：对于这些用户来说，车内空气质量对婴幼儿健康至关重要，使用空气净化功能可以保证车内空气的质量。
         职业司机：长时间驾驶车辆的司机需要呼吸干净的空气，以避免疲劳和健康问题。
         对环保有意识的人群：这些用户关心环境保护和减少对环境的污染，使用空气净化功能可以减少车辆对环境的影响。
         总之，使用空气净化功能可以让车内空气更加清新健康，吸引多种用户群体的关注。
-    """, role="assistant")
-]
+"""
