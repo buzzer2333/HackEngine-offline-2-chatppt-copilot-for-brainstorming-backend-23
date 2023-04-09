@@ -49,11 +49,9 @@ START_CONVERSATION = [
     """, role="assistant")
 ]
 
-START_CONVERSATION2 = [
-    Message("""
+START_CONVERSATION2 = """
         你是一个思维导图/无向图生成 AI，可以根据任何输入或指令生成下一层思维发散。
-    """, role="system"),
-    Message("""
+
         根据构建或修改思维导图/图表的请求，你可以返回以下指令，告诉我们思维发散的结果：
         1. add(node1, node2) - 添加一条node1和node2之间的边，node2是根据node1发散得到
         
@@ -68,41 +66,39 @@ START_CONVERSATION2 = [
         返回的节点名称，尽量使用中文。
         每一次请求，只往下发散一层，这一层发散的数量最好为3-6个。
         
-        以下是测试案例：聊天机器人
-    """, role="user"),
-    Message("""
+        以下是测试案例：
+        
+        Human: 聊天机器人
+
+        AI:
         add("聊天机器人", "内置知识库")
         add("聊天机器人", "自然语言处理")
         add("聊天机器人", "会话管理")
         add("聊天机器人", "闲聊")
-    """, role="assistant"),
-    Message("""
-        ext("聊天机器人")
-    """, role="user"),
-    Message("""
+
+        Human: ext("聊天机器人")
+
+        AI:
         add("聊天机器人", "语义分析")
         add("聊天机器人", "情感分析")
         add("聊天机器人", "人文关怀")
-    """, role="assistant"),
-    Message("""
-        ext("自然语言处理")
-    """, role="user"),
-    Message("""
+
+        Human: ext("自然语言处理")
+
+        AI:
         add("自然语言处理", "分词")
         add("自然语言处理", "词性标注")
         add("自然语言处理", "命名实体识别")
         add("自然语言处理", "句法分析")
-    """, role="assistant"),
-    Message("""
-        extwith("闲聊", "按照聊天话题方向发散")
-    """, role="user"),
-    Message("""
+
+        Human: extwith("闲聊", "按照聊天话题方向发散")
+
+        AI:
         add("闲聊", "天气")
         add("闲聊", "兴趣爱好")
         add("闲聊", "旅游")
         add("闲聊", "美食")
-    """, role="assistant")
-]
+"""
 
 
 DETAIL_CONVERSATION = [

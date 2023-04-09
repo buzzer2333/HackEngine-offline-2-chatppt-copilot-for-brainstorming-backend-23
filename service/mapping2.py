@@ -19,20 +19,26 @@ from module.conservation import START_CONVERSATION, START_CONVERSATION2
 from module.node import NodeData
 
 
-def ask_chatgpt(conversation: List[Message]) -> Tuple[str, List[Message]]:
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+def ask_chatgpt(conversation: str) -> Tuple[str, str]:
+    response = openai.Completion.create(
+        model="text-davinci-003",
         # asdict comes from `from dataclasses import asdict`
-        messages=[asdict(c) for c in conversation]
+        prompt=conversation,
+        temperature=0.9,
+        max_tokens=1500,
+        top_p=1,
+        frequency_penalty=0.0,
+        presence_penalty=0.6,
+        stop=[" Human:", " AI:"]
     )
 
     # print("response:", response)
     # turn into a Message object
-    msg = Message(**response["choices"][0]["message"])
+    msg = response["choices"][0]["text"]
     # return the text output and the new conversation
     # print("msg:%s, conversation:%s", msg, conversation)
 
-    return msg.content, conversation + [msg]
+    return msg, conversation + msg
 
 
 def parse_and_include_edges(output: str) -> []:
@@ -71,7 +77,7 @@ class MindMap2:
     """
 
     def __init__(self) -> None:
-        self.conversation = []
+        self.conversation = ""
 
     def ask_for_initial_graph(self, query: str) -> []:
         """Ask GPT-3 to construct a graph from scrach.
@@ -83,14 +89,12 @@ class MindMap2:
             str: The output from GPT-3.
         """
 
-        conversation = START_CONVERSATION2 + [
-            Message(f"""
+        conversation = START_CONVERSATION2 + f"""
                 现在忽略掉之前的测试案例，我们重新开始。
                 我希望你根据下面的描述创建：  
 
-                {query}
-            """, role="user")
-        ]
+                Human: {query}
+                AI:"""
 
         output, self.conversation = ask_chatgpt(conversation)
         # replace=True to restart
@@ -119,10 +123,9 @@ class MindMap2:
             output = f"""
                 add("{selected_node}","{text}")
             """
-            self.conversation.append(Message(
-                output,
-                role="user"
-            ))
+            self.conversation += f"""
+                Human: add("{selected_node}","{text}")
+                """
             parse_and_include_edges(output)
             # self.save()
             return
@@ -137,19 +140,15 @@ class MindMap2:
         if text is None:
             # prepend a description that this node.py
             # should be extended
-            conversation = self.conversation + [
-                Message(f"""
-                    ext("{selected_node}")
-                """, role="user")
-            ]
+            conversation = self.conversation + f"""
+                    Human: ext("{selected_node}")
+                    AI: """
             st.session_state.last_expanded = selected_node
         else:
             # just provide the description
-            conversation = self.conversation + [
-                Message(f"""
-                    extwith("{selected_node}", "{text}")
-                """, role="user")
-            ]
+            conversation = self.conversation + f"""
+                    Human: extwith("{selected_node}", "{text}")
+                    AI: """
 
         Log.infof("conversation: %s", conversation)
 
