@@ -101,6 +101,7 @@ class MindMap:
         Returns:
             str: GPT-3 output
         """
+        Log.infof("selected_node: %s, text: %s, manual: %s", selected_node, text, manual)
 
         if selected_node not in self.map and text is None and not manual:
             Log.errorf("params error")
@@ -140,6 +141,8 @@ class MindMap:
         else:
             # just provide the description
             conversation = self.conversation + [Message(text, role="user")]
+
+        Log.infof("conversation: %s", conversation)
 
         # now self.conversation is updated
         output, self.conversation = ask_chatgpt(conversation)
