@@ -40,8 +40,12 @@ def expand():
     manual = bool(request.json.get("manual"))
 
     userid = get_user_id()
+    if userid not in user2map:
+        user2map[userid] = MindMap()
+
     m = user2map[userid]
     m.ask_for_extended_graph(selected_node=selected_node, text=text, manual=manual)
+    Log.infof("get user2Map as %s", user2map)
 
     rsp = make_response(json.dumps(m.root, default=default))
     add_header(rsp)
@@ -70,8 +74,12 @@ def expand_v2():
     manual = bool(request.json.get("manual"))
 
     userid = get_user_id()
+    if userid not in user2map:
+        user2map[userid] = MindMap2()
+
     m = user2map[userid]
     re = m.ask_for_extended_graph(selected_node=selected_node, text=text, manual=manual)
+    Log.infof("get user2Map as %s", user2map)
 
     rsp = make_response(json.dumps(re))
     add_header(rsp)
@@ -88,12 +96,14 @@ def init():
 
     query = request.json.get("query")
     Log.infof("get query as %s", query)
-    m = MindMap()
-    m.ask_for_initial_graph(query)
 
     # 存储用户mindMap
     userid = get_user_id()
-    user2map[userid] = m
+    if userid not in user2map:
+        user2map[userid] = MindMap()
+
+    m = user2map[userid]
+    m.ask_for_initial_graph(query)
     Log.infof("get user2Map as %s", user2map)
 
     rsp = make_response(json.dumps({"data": m.root, "code": 0}, default=default))
@@ -111,12 +121,13 @@ def init_v2():
 
     query = request.json.get("query")
     Log.infof("get query as %s", query)
-    m = MindMap2()
-    re = m.ask_for_initial_graph(query)
 
-    # 存储用户mindMap
     userid = get_user_id()
-    user2map[userid] = m
+    if userid not in user2map:
+        user2map[userid] = MindMap2()
+
+    m = user2map[userid]
+    re = m.ask_for_initial_graph(query)
     Log.infof("get user2Map as %s", user2map)
 
     rsp = make_response(json.dumps(re))
