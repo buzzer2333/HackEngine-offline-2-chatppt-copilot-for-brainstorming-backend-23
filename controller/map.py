@@ -30,7 +30,11 @@ def get_user_id() -> str:
 # 扩展头脑风暴图的某个节点
 @map_blue.route("/expand", methods=["POST", "OPTIONS"])
 def expand():
-    # todo :: biz
+    if request.method == "OPTIONS":
+        rsp = make_response()
+        add_header(rsp)
+        return rsp
+
     selected_node = request.json.get("selected_node")
     text = request.json.get("text")
     manual = bool(request.json.get("manual"))
@@ -56,7 +60,11 @@ def add_header(rsp):
 # 扩展头脑风暴图的某个节点
 @map_blue.route("/v2/expand", methods=["POST", "OPTIONS"])
 def expand_v2():
-    # todo :: biz
+    if request.method == "OPTIONS":
+        rsp = make_response()
+        add_header(rsp)
+        return rsp
+
     selected_node = request.json.get("selected_node")
     text = request.json.get("text")
     manual = bool(request.json.get("manual"))
@@ -73,6 +81,11 @@ def expand_v2():
 # 初始化头脑风暴图
 @map_blue.route("/init", methods=["POST", "OPTIONS"])
 def init():
+    if request.method == "OPTIONS":
+        rsp = make_response()
+        add_header(rsp)
+        return rsp
+
     query = request.json.get("query")
     Log.infof("get query as %s", query)
     m = MindMap()
@@ -91,6 +104,11 @@ def init():
 # 初始化头脑风暴图2
 @map_blue.route("/v2/init", methods=["POST", "OPTIONS"])
 def init_v2():
+    if request.method == "OPTIONS":
+        rsp = make_response()
+        add_header(rsp)
+        return rsp
+
     query = request.json.get("query")
     Log.infof("get query as %s", query)
     m = MindMap2()
@@ -109,10 +127,16 @@ def init_v2():
 # 获取某个节点的相关信息
 @map_blue.route("/detail", methods=["GET", "OPTIONS"])
 def detail():
+    if request.method == "OPTIONS":
+        rsp = make_response()
+        add_header(rsp)
+        return rsp
+
     node_id = request.args.get("id")
     node_label = request.args.get("label")
     query = request.args.get("query")
     Log.infof("get id as %s, label as %s", node_id, node_label)
+
     user_id = get_user_id()
     if user_id not in user2info:
         entity_info = EntityInfos()
@@ -120,6 +144,7 @@ def detail():
         user2info[user_id] = entity_info
     else:
         output = user2info[user_id].ask_for_more_detail(query, node_id)
+
     rsp = make_response(jsonify({"data": output, "code": 0}))
     add_header(rsp)
     return rsp
