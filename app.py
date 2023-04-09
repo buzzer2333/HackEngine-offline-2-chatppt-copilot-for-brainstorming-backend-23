@@ -13,7 +13,7 @@ app.register_blueprint(blueprint=map_blue)
 
 
 # return index.html
-@app.route("/", methods=["GET", "POST"])
+@app.route("/666", methods=["GET", "POST"])
 def index():
     if session.get("user_id") is None:
         # 这里是假设用户只会从/路由进入应用
