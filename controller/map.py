@@ -13,6 +13,7 @@ user2map = dict()
 user2info = dict()
 
 
+# 获取user_id
 def get_user_id() -> str:
     # 存储用户mindMap
     user_id = session.get('user_id')
@@ -25,6 +26,7 @@ def get_user_id() -> str:
     return user_id
 
 
+# 扩展头脑风暴图的某个节点
 @map_blue.route("/expand", methods=["POST"])
 def expand():
     # todo :: biz
@@ -34,22 +36,24 @@ def expand():
     return jsonify(params)
 
 
+# 初始化头脑风暴图
 @map_blue.route("/init", methods=["POST"])
 def init():
-    inputs = request.get_data()
-    Log.infof("get inputs as %s", inputs)
+    query = request.json.get("query")
+    Log.infof("get query as %s", query)
     m = MindMap()
-    m.ask_for_initial_graph(inputs)
+    m.ask_for_initial_graph(query)
 
     # 存储用户mindMap
     userid = get_user_id()
     user2map[userid] = m
     Log.infof("get user2Map as %s", user2map)
-    rsp = make_response(json.dumps(m.root, default=default))
+    rsp = make_response(json.dumps({"data": m.root, "code": 0}, default=default))
     rsp.headers["Content-Type"] = "application/json; charset=utf-8"
     return rsp
 
 
+# 获取某个节点的相关信息
 @map_blue.route("/detail", methods=["GET"])
 def detail():
     node_id = request.args.get("id")
@@ -63,4 +67,4 @@ def detail():
         user2info[user_id] = entity_info
     else:
         output = user2info[user_id].ask_for_more_detail(query, node_id)
-    return jsonify({"data": output})
+    return jsonify({"data": output, "code": 0})
