@@ -19,7 +19,7 @@ def get_user_id() -> str:
     # 存储用户mindMap
     user_id = session.get('user_id')
     if user_id is None:
-        user_id = uuid.uuid4()
+        user_id = uuid.uuid4().hex
         session['user_id'] = user_id
         Log.errorf("get user id failed, re-generate one as %s", user_id)
         return user_id
@@ -73,8 +73,9 @@ def expand_v2():
     selected_node = request.json.get("selected_node")
     text = request.json.get("text")
     manual = bool(request.json.get("manual"))
-
-    userid = get_user_id()
+    userid = request.json.get("uid")
+    Log.infof("get uid from request as %s", userid)
+    # userid = get_user_id()
     if userid not in user2map:
         user2map[userid] = MindMap2()
 
@@ -131,7 +132,8 @@ def init_v2():
     re = m.ask_for_initial_graph(query)
     Log.infof("get user2Map as %s", user2map)
 
-    rsp = make_response(json.dumps(re))
+    rsp = make_response({"data": json.dumps(re), "uid": userid})
+    Log.infof("return as %s", rsp)
     add_header(rsp)
     return rsp
 

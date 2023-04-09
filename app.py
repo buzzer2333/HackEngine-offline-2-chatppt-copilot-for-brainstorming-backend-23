@@ -18,7 +18,7 @@ def index():
     if session.get("user_id") is None:
         # 这里是假设用户只会从/路由进入应用
         # 生成随机数标识用户
-        user_id = uuid.uuid4()
+        user_id = uuid.uuid4().hex
         print(user_id)
         Log.infof("get user_id as %s", user_id)
         session["user_id"] = user_id
