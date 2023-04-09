@@ -41,6 +41,7 @@ def expand():
 
     rsp = make_response(json.dumps(m.root, default=default))
     rsp.headers["Content-Type"] = "application/json; charset=utf-8"
+    rsp.headers["Access-Control-Allow-Origin"] = "*"
     return rsp
 
 
@@ -58,6 +59,7 @@ def expand_v2():
 
     rsp = make_response(json.dumps(re))
     rsp.headers["Content-Type"] = "application/json; charset=utf-8"
+    rsp.headers["Access-Control-Allow-Origin"] = "*"
     return rsp
 
 
@@ -76,6 +78,7 @@ def init():
 
     rsp = make_response(json.dumps({"data": m.root, "code": 0}, default=default))
     rsp.headers["Content-Type"] = "application/json; charset=utf-8"
+    rsp.headers["Access-Control-Allow-Origin"] = "*"
     return rsp
 
 
@@ -94,6 +97,7 @@ def init_v2():
 
     rsp = make_response(json.dumps(re))
     rsp.headers["Content-Type"] = "application/json; charset=utf-8"
+    rsp.headers["Access-Control-Allow-Origin"] = "*"
     return rsp
 
 
@@ -111,4 +115,7 @@ def detail():
         user2info[user_id] = entity_info
     else:
         output = user2info[user_id].ask_for_more_detail(query, node_id)
-    return jsonify({"data": output, "code": 0})
+    rsp = make_response(jsonify({"data": output, "code": 0}))
+    rsp.headers["Content-Type"] = "application/json; charset=utf-8"
+    rsp.headers["Access-Control-Allow-Origin"] = "*"
+    return rsp
