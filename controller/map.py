@@ -28,7 +28,7 @@ def get_user_id() -> str:
 
 
 # 扩展头脑风暴图的某个节点
-@map_blue.route("/expand", methods=["POST"])
+@map_blue.route("/expand", methods=["POST", "OPTIONS"])
 def expand():
     # todo :: biz
     selected_node = request.json.get("selected_node")
@@ -54,7 +54,7 @@ def add_header(rsp):
 
 
 # 扩展头脑风暴图的某个节点
-@map_blue.route("/v2/expand", methods=["POST"])
+@map_blue.route("/v2/expand", methods=["POST", "OPTIONS"])
 def expand_v2():
     # todo :: biz
     selected_node = request.json.get("selected_node")
@@ -71,7 +71,7 @@ def expand_v2():
 
 
 # 初始化头脑风暴图
-@map_blue.route("/init", methods=["POST"])
+@map_blue.route("/init", methods=["POST", "OPTIONS"])
 def init():
     query = request.json.get("query")
     Log.infof("get query as %s", query)
@@ -89,7 +89,7 @@ def init():
 
 
 # 初始化头脑风暴图2
-@map_blue.route("/v2/init", methods=["POST"])
+@map_blue.route("/v2/init", methods=["POST", "OPTIONS"])
 def init_v2():
     query = request.json.get("query")
     Log.infof("get query as %s", query)
@@ -107,7 +107,7 @@ def init_v2():
 
 
 # 获取某个节点的相关信息
-@map_blue.route("/detail", methods=["GET"])
+@map_blue.route("/detail", methods=["GET", "OPTIONS"])
 def detail():
     node_id = request.args.get("id")
     node_label = request.args.get("label")
