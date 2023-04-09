@@ -57,6 +57,7 @@ def add_header(rsp):
     rsp.headers["Access-Control-Allow-Origin"] = "*"
     rsp.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
     rsp.headers["Access-Control-Allow-Headers"] = "X-PINGOTHER, Content-Type, withCredentials"
+    rsp.headers["Access-Control-Allow-Credentials"] = "true"
     rsp.headers["Access-Control-Max-Age"] = 86400
     rsp.headers["Vary"] = "Accept-Encoding, Origin"
 
