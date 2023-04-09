@@ -45,7 +45,9 @@ class EntityInfos:
 
         if new:
             conversation = DETAIL_CONVERSATION + f"""
-                不错, 我会问你些具体问题:
+            
+                好的，现在我们忽略前面的测试案例，开始新的测试。
+                接下来我会提出问题。
                     
                 Human: {query}
                 AI:"""
